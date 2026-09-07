@@ -1,437 +1,294 @@
-# Neuro SAN Studio
+# Fraud Defense Autonomy Engine
 
-## Hackathon application: Fraud War Room
+### 🎥 Fraud Defense Project Demo
 
-This repository includes a synthetic NA BFS Fraud Defense Autonomy Engine at [`apps/fraud_war_room/README.md`](apps/fraud_war_room/README.md). It uses the repository's Neuro SAN HOCON agent network to investigate alerts, reconstruct attacks, generate and adversarially challenge defenses, simulate counterfactual outcomes, govern human approval, enter shadow mode, and learn from outcomes.
-
-**Your launchpad for building intelligent multi-agent systems.** Neuro SAN Studio is a hands-on playground for the
-[Neuro SAN](https://github.com/cognizant-ai-lab/neuro-san) framework, featuring ready-to-run examples, tutorials, and
-tools that let you design, test, and deploy sophisticated agent networks in minutes—not months. Whether you're a
-researcher exploring adaptive AI systems, a developer prototyping production solutions, or a domain expert configuring
-agents without code, this studio handles the orchestration complexity so you can focus on solving real problems.
-
----
-
-<!-- pyml disable-next-line no-inline-html -->
 <p align="center">
-  Neuro SAN is the open-source library powering the Cognizant Neuro® AI Multi-Agent Accelerator, allowing domain experts,
-  researchers and developers to immediately start prototyping and building agent networks across any industry vertical.
+  <video src="./Neuro_SAN-2377778.mp4" controls autoplay muted loop playsinline width="960" poster="./docs/images/overview.png" style="max-width:100%; border-radius:12px;">
+    Your browser does not support the video tag.
+  </video>
 </p>
 
----
+Fraud War Room is the submission application for the Cognizant NA BFS hackathon. It demonstrates a governed, multi-agent Fraud Defense Autonomy Engine for synthetic banking data. The system moves from alert to investigation, adversarial challenge, defense simulation, policy review, human approval, shadow observation, and outcome learning while keeping deterministic facts traceable and high-risk actions under human control.
 
-<!-- pyml disable-next-line no-inline-html -->
-<p align="center">
-  <!-- GitHub Stats -->
-  <img src="https://img.shields.io/github/stars/cognizant-ai-lab/neuro-san-studio?style=social" alt="GitHub stars">
-  <img src="https://img.shields.io/github/forks/cognizant-ai-lab/neuro-san-studio?style=social" alt="GitHub forks">
-  <img src="https://img.shields.io/github/watchers/cognizant-ai-lab/neuro-san-studio?style=social" alt="GitHub watchers">
-</p>
-<p align="center">
-  <!-- GitHub Info -->
-  <img src="https://img.shields.io/github/last-commit/cognizant-ai-lab/neuro-san-studio" alt="Last Commit">
-  <img src="https://img.shields.io/github/issues/cognizant-ai-lab/neuro-san-studio" alt="Issues">
-  <img src="https://img.shields.io/github/issues-pr/cognizant-ai-lab/neuro-san-studio" alt="Pull Requests">
-  <a href="https://pepy.tech/projects/neuro-san-studio"><img alt="PyPI Downloads"
-  src="https://static.pepy.tech/badge/neuro-san-studio" /></a>
-  <a href="https://pypi.org/project/neuro-san-studio/">
-  <img alt="neuro-san-studio@PyPI" src="https://img.shields.io/pypi/v/neuro-san-studio.svg?style=flat-square"></a>
-  <a href="https://deepwiki.com/cognizant-ai-lab/neuro-san-studio">
-  <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki: Neuro SAN Studio" /></a>
+The design principle is simple: an alert score is a starting point, not a decision. Every recommendation must show its evidence, counter-evidence, competing explanations, attack test, customer-impact trade-off, model disagreement, governance result, approval state, and Decision Passport.
 
-</p>
+## Submission assets
 
-<!-- pyml disable-next-line no-inline-html -->
-<p align="center">
-  <!-- Neuro SAN Stats -->
-  Neuro SAN library <br>
-  <a href="https://github.com/cognizant-ai-lab/neuro-san"><img alt="GitHub Repo"
-  src="https://img.shields.io/badge/GitHub-Repo-green.svg" /></a>
-  <img src="https://img.shields.io/github/commit-activity/m/cognizant-ai-lab/neuro-san" alt="commit activity">
-  <a href="https://pepy.tech/projects/neuro-san"><img alt="PyPI Downloads"
-  src="https://static.pepy.tech/badge/neuro-san" /></a>
-  <a href="https://pypi.org/project/neuro-san/">
-  <img alt="neuro-san@PyPI" src="https://img.shields.io/pypi/v/neuro-san.svg?style=flat-square"></a>
-  <a href="https://deepwiki.com/cognizant-ai-lab/neuro-san">
-  <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki: Neuro SAN" /></a>
-</p>
+- Live dashboard: <http://127.0.0.1:8090>
+- Interactive six-slide deck: <http://127.0.0.1:8090/static/presentation.html>
+- Downloadable PowerPoint: <http://127.0.0.1:8090/static/Fraud_Defense_Autonomy_Engine_Submission.pptx>
+- Neuro SAN / NSFlow UI: <http://127.0.0.1:4175> when started with the demo port override, or <http://127.0.0.1:4173> with the default runner settings
+- Canonical network: `industry/fraud_defense`
+- Flagship synthetic case: `CASE-0001`
 
-## What is Neuro SAN?
+The browser deck supports arrow keys, space, swipe gestures, fullscreen presentation, and print-to-PDF. The PowerPoint file contains the same six-slide narrative for submission and offline presenting.
 
-[**Neuro AI system of agent networks (Neuro SAN)**](https://github.com/cognizant-ai-lab/neuro-san) is an open-source,
-data-driven multi-agent orchestration framework designed to simplify and accelerate the development of collaborative AI
-systems. It allows users—from machine learning engineers to business domain experts—to quickly build sophisticated
-multi-agent applications without extensive coding, using declarative configuration files (in HOCON format).
+## The problem
 
-Neuro SAN enables multiple large language model (LLM)-powered agents to collaboratively solve complex tasks, dynamically
-delegating subtasks through adaptive inter-agent communication protocols. This approach addresses the limitations inherent
-to single-agent systems, where no single model has all the expertise or context necessary for multifaceted problems.
+Financial fraud operations have three related gaps:
 
-<!-- pyml disable line-length -->
-| Build a multi-agent network in minutes                                              | Neuro SAN overview                                                                     | Quick start                                                              |
-|-------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| [![Build](./docs/images/designer.png)](https://www.youtube.com/watch?v=wGxvPBN34Mk) | [![Overview](./docs/images/overview.png)](https://www.youtube.com/watch?v=NmniQWQT6vI) | [![Start](./docs/images/nsflow_thumb.png)](https://youtu.be/gfem8ylphWA) |
+1. **Scores lack context.** A risk score does not reconstruct the transaction sequence, customer baseline, connected entities, or legitimate explanations an investigator must review.
+2. **Controls are rarely challenged before rollout.** A proposed hold, step-up, or review control can fail against the next attacker variation or impose unnecessary friction on legitimate customers.
+3. **Decisions are difficult to defend later.** Evidence, model opinions, policy checks, approvals, and observed outcomes are often scattered across tools instead of being captured as one traceable record.
 
-<!-- pyml enable line-length -->
----
+Fraud War Room turns these gaps into one bounded operating loop. It is designed for a clear demo with synthetic data, while preserving the control points expected in an enterprise fraud workflow.
 
-### ✨ Key Features
+## The solution
 
-* **🗂️ Data-Driven Configuration**: Entire agent networks are defined declaratively via simple HOCON files, empowering
-technical and non-technical stakeholders to design agent interactions intuitively.
-* **🔀 Adaptive Communication ([AAOSA Protocol](https://arxiv.org/abs/cs/9812015))**: Agents autonomously determine how
-to delegate tasks, making interactions fluid and dynamic with decentralized decision-making.
-* **🔒 Sly-Data**: Sly Data facilitates safe handling and transfer of sensitive data between agents without exposing it
-directly to any language models.
-* **🧩 Dynamic Agent Network Designer**: Includes a meta-agent called the Agent Network Designer – essentially, an agent
-that creates other agent networks. Provided as an example with Neuro SAN, it can take a high-level description of a
-use-case as input and generate a new custom agent network for it.
-* **🛠️ Flexible Tool Integration**: Integrate custom Python-based "coded tools," APIs, databases, and even external
-agent ecosystems (Agentforce, Agentspace, CrewAI, MCP, A2A agents, LangChain tools and more) seamlessly into your agent workflows.
-* **📈 Robust Traceability**: Detailed logging, tracing, and session-level metrics enhance transparency, debugging, and
-operational monitoring.
-* **🌐 Extensible and Cloud-Agnostic**: Compatible with a wide variety of LLM providers (OpenAI, Anthropic, Azure, Ollama,
-etc.) and deployable in diverse environments (local machines, containers, or cloud infrastructures).
+The engine combines four capabilities:
 
----
+- **Deterministic evidence first.** Python coded tools calculate signals, baselines, graph findings, timelines, risk, governance checks, simulations, and learning records. The LLM layer explains and challenges these facts; it does not calculate hidden labels or invent transaction data.
+- **Independent reasoning lanes.** Behavioral, relationship, and customer-baseline analysts inspect the same case packet independently before an Evidence Librarian reconciles their findings.
+- **Adversarial defense design.** A Competing Hypothesis Lab preserves benign and fraud explanations. An Adversary-in-Residence creates a bounded synthetic bypass challenge, and a Counterfactual Simulator compares candidate controls before approval.
+- **Governed lifecycle.** An Independent Model Jury exposes disagreement, the Governance Gate checks policy, the Decision Passport records the decision, and a human investigator must approve high-risk recommendations before a control can enter `SHADOW`. Shadow observation and outcome learning never activate a production rule directly.
 
-### Use Cases
+## Architecture at a glance
 
-Here are a few examples of use-cases that have been implemented with Neuro SAN.
-For more examples, check out [docs/examples.md](docs/examples.md).
-<!-- pyml disable no-inline-html -->
-<table>
-  <thead>
-    <tr>
-      <th>Agent Network</th>
-      <th>Use-Case</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>🧬 <strong>Agent Network Designer</strong></td>
-      <td>Automated generation of multi-agent HOCON configurations.</td>
-      <td>Generates complex multi-agent configurations from natural language input, simplifying the creation of intricate
-      agent workflows.</td>
-    </tr>
-    <tr>
-      <td>🛫 <strong>Airline Policy Assistance</strong></td>
-      <td>Customer support for airline policies.</td>
-      <td>Agents interpret and explain airline policies, assisting customers with inquiries about baggage allowances, cancellations,
-      and travel-related concerns.</td>
-    </tr>
-    <tr>
-      <td>🏦 <strong>Banking Operations & Compliance</strong></td>
-      <td>Automated financial operations and regulatory compliance.</td>
-      <td>Automates tasks such as transaction monitoring, fraud detection, and compliance reporting, ensuring adherence to
-      regulations and efficient routine operations.</td>
-    </tr>
-    <tr>
-      <td>🛍️ <strong>Consumer Packaged Goods (CPG)</strong></td>
-      <td>Market analysis and product development in CPG.</td>
-      <td>Gathers and analyzes market trends, customer feedback, and sales data to support product development and strategic
-      marketing.</td>
-    </tr>
-    <tr>
-      <td>🛡️ <strong>Insurance Agents</strong></td>
-      <td>Claims processing and risk assessment.</td>
-      <td>Automates claims evaluation, assesses risk factors, ensures policy compliance, and improves claim-handling efficiency
-      and customer satisfaction.</td>
-    </tr>
-    <tr>
-      <td>🏢 <strong>Intranet Agents</strong></td>
-      <td>Internal knowledge management and employee support.</td>
-      <td>Provides employees with quick access to policies, HR, and IT support, enhancing internal communications and resource
-      accessibility.</td>
-    </tr>
-    <tr>
-      <td>🛒 <strong>Retail Operations & Customer Service</strong></td>
-      <td>Enhancing retail customer experience and operational efficiency.</td>
-      <td>Handles customer inquiries, inventory management, and supports sales processes to optimize operations and service
-      quality.</td>
-    </tr>
-    <tr>
-      <td>📞 <strong>Telco Network Support</strong></td>
-      <td>Technical support and network issue resolution.</td>
-      <td>Diagnoses network problems, guides troubleshooting, and escalates complex issues, reducing downtime and enhancing
-      customer service.</td>
-    </tr>
-    <tr>
-      <td>📞 <strong>Therapy Vignette Supervision</strong></td>
-      <td>Generates treatment plan for a given therapy vignette.</td>
-      <td>A good example of using multiple different expert agents working together to come up with a single plan.</td>
-    </tr>
-  </tbody>
-</table>
-<!-- pyml enable no-inline-html -->
-
-And many more: check out [docs/examples.md](docs/examples.md).
-
----
-
-## High level Architecture
-
-<!-- pyml disable no-inline-html -->
-<p align="left">
-  <img src="./docs/images/neuroai_arch_diagram.png" alt="neuro-san architecture" width="800"/>
-</p>
-<!-- pyml enable no-inline-html -->
-
----
-
-## Install
-
-These instructions are for Linux and macOS systems. Please adjust the commands accordingly for Windows.
-
-### Install `uv`
-
-[`uv`](https://docs.astral.sh/uv/) is a fast Python package and project manager built by Astral.
-
-Official installation docs:
-👉 [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
-
-### Create a new Python project
-
-Create a folder for your project:
-
-```bash
-mkdir my_project
-cd my_project
+```mermaid
+flowchart LR
+    A[Alert / case request] --> B[Fraud Commander]
+    B --> C[Signal Intake]
+    C --> D[Triage Router]
+    D --> E[Deterministic Case Packet]
+    E --> F[Behavioral Signals]
+    E --> G[Relationship Forensics]
+    E --> H[Customer Baseline]
+    F --> I[Evidence Librarian]
+    G --> I
+    H --> I
+    I --> J[Competing Hypothesis Lab]
+    J --> K[Adversary in Residence]
+    K --> L[Defense Architect]
+    L --> M[Counterfactual Simulator]
+    M --> N[Independent Model Jury]
+    N --> O[Governance Gate]
+    O --> P[Decision Passport]
+    P --> Q{Human Approval Gate}
+    Q -->|approved| R[Shadow Observer]
+    R --> S[Outcome Learning Loop]
+    S -. next governed test .-> D
 ```
 
-Create a virtual environment, initialize a git repo and install `neuro-san-studio`
+The registry makes this topology visible in Neuro SAN. The network contains 18 named nodes and 17 directed handoffs. `Fraud Commander` is the conversational front door; `run_case_review` is the deterministic coded tool inside the triage path; all other stages have one bounded responsibility and an explicit handoff.
+
+## Node catalog
+
+| # | Registry node | Display name | Responsibility and guardrail |
+| ---: | --- | --- | --- |
+| 1 | `fraud_commander` | Fraud Commander | Extracts the synthetic case ID, coordinates the full investigation, and returns the investigator-facing brief. It never approves, rejects, deploys, or records an outcome from chat. |
+| 2 | `case_intake` | Signal Intake | Normalizes the request, confirms the case scope, and passes the original request and case ID to triage. It does not infer missing facts or make a risk decision. |
+| 3 | `triage_router` | Triage Router | Calls the deterministic review once, fans the same packet into three independent analyst lanes, preserves disagreements, and invokes evidence synthesis after the lanes complete. |
+| 4 | `run_case_review` | Deterministic Case Packet | A coded tool that creates the source-of-truth packet: signals, timeline, graph findings, hypotheses, controls, governance checks, simulation inputs, routing context, and passport data. |
+| 5 | `behavioral_signals` | Behavioral Signal Lab | Examines transaction sequence, amount anomalies, device novelty, location novelty, and beneficiary behavior. It separates observed facts from interpretation and names disconfirming evidence. |
+| 6 | `relationship_forensics` | Relationship Graph Forensics | Investigates connected accounts, devices, beneficiaries, components, central entities, and campaign structure. Connectivity is treated as a signal, not proof. |
+| 7 | `customer_baseline` | Customer Baseline | Compares the case with customer and account history, identifies normal behavior and deviations, and records plausible authorized explanations and customer-impact risks. |
+| 8 | `evidence_synthesizer` | Evidence Librarian | Builds a balanced evidence ledger with supporting evidence, counter-evidence, missing evidence, traceability, and confidence limits. |
+| 9 | `hypothesis_lab` | Competing Hypothesis Lab | Generates and ranks multiple explanations, including authorized, accidental, and coordinated-fraud hypotheses when evidence supports them. |
+| 10 | `adversary_in_residence` | Adversary in Residence | Stress-tests the leading hypothesis and investigation logic with one bounded synthetic bypass scenario. It reports what signal changes and whether the current evidence detects it; it does not provide criminal instructions. |
+| 11 | `defense_architect` | Defense Architect | Designs proportional prevention, step-up, hold, and review controls. Each option includes friction, reversibility, and safe operating conditions. |
+| 12 | `counterfactual_simulator` | Counterfactual Simulator | Compares candidate controls against synthetic variants using fraud prevented, attack success, false-positive rate, customer friction, and utility. It explains the selected control and uncertainty. |
+| 13 | `model_jury` | Independent Model Jury | Reviews the evidence, hypotheses, attack challenge, and simulation using independent model opinions or labelled local heuristic opinions. Disagreement is exposed, never silently averaged away. |
+| 14 | `governance_gate` | Governance Gate | Checks evidence sufficiency, counter-evidence, model disagreement, simulation coverage, proportionality, human approval, and the rule that approved controls enter `SHADOW` only. |
+| 15 | `decision_passport` | Decision Passport | Creates the auditable decision record with case ID, reason codes, evidence, hypotheses, adversarial outcome, selected simulation, jury record, failed checks, approval requirement, lifecycle, and audit events. |
+| 16 | `human_approval_gate` | Human Approval Gate | Presents the recommendation, failed checks, customer-impact trade-off, and passport reference. High and critical cases remain pending until an explicit investigator action in the War Room UI. |
+| 17 | `shadow_observer` | Shadow Observer | Runs only after approval has been recorded. It introduces a bounded synthetic attacker variation, reports containment or bypass, and keeps the control in `SHADOW`; it never activates production enforcement. |
+| 18 | `outcome_learner` | Outcome Learning Loop | Compares predicted simulation results with the shadow observation, identifies drift or a new bypass, and proposes the next governed test. It never changes a production rule directly. |
+
+## End-to-end flow
+
+1. An investigator opens a synthetic case such as `CASE-0001` or asks the network to investigate it.
+2. Fraud Commander and Signal Intake validate the request and case scope.
+3. Triage Router calls `run_case_review` once. This produces deterministic facts and keeps hidden benchmark labels outside the agent context.
+4. The packet is reviewed independently by Behavioral Signal Lab, Relationship Graph Forensics, and Customer Baseline.
+5. Evidence Librarian reconciles the three memos and records supporting, counter, and missing evidence.
+6. Competing Hypothesis Lab keeps multiple explanations alive instead of forcing an early binary conclusion.
+7. Adversary in Residence challenges the leading hypothesis and the assumptions behind the proposed defense.
+8. Defense Architect proposes proportional controls, and Counterfactual Simulator evaluates them against synthetic attack variants and false-positive costs.
+9. Independent Model Jury records provider names, confidence spread, and disagreement. High-risk disagreement can require more evidence.
+10. Governance Gate applies policy checks. Decision Passport records the result, including any failed check and required human action.
+11. Human Approval Gate stops high and critical actions until an investigator explicitly approves, rejects, or requests more investigation in the dashboard.
+12. An approved control enters `SHADOW`. Shadow Observer tests a new bounded attacker variation, and Outcome Learning records predicted-versus-observed behavior for the next governed review.
+
+The natural-language commander explains this handoff in plain language. Structured data remains in the coded workbench and Decision Passport so an operator can inspect the source of every important statement.
+
+## Technology and model routing
+
+| Layer | Implementation | Why it is used |
+| --- | --- | --- |
+| Agent orchestration | Neuro SAN with HOCON registry configuration | Makes the 18-node topology, instructions, tools, and handoffs explicit and inspectable. |
+| Network definition | `registries/industry/fraud_defense.hocon` | Single canonical `industry/fraud_defense` network with bounded steps and execution time. |
+| Deterministic domain core | Python standard-library package under `coded_tools/fraud_defense/` | Keeps facts, scoring, graph traversal, simulation, governance, and persistence reproducible and key-free. |
+| Investigator surface | `apps/fraud_war_room/` standard-library HTTP server plus static HTML/CSS/JS | Provides the live case queue, graph, timeline, evidence, controls, approval, shadow lifecycle, learning, and passport views. |
+| Primary LLM | Cerebras API, Qwen 3.8 27B | Used by the native Neuro SAN network when `CEREBRAS_API_KEY` is configured. The default endpoint is `https://api.cerebras.ai/v1`. |
+| Fallback LLMs | Gemini and NVIDIA, configured in HOCON | Keep the network operational when the primary provider is unavailable, subject to the same governance controls. |
+| Optional provider roles | NVIDIA, Gemini, and Sarvam in `config/fraud_defense_models.json` | Allow risk-tiered worker routing, independent opinions, and optional voice or language extensions without changing the graph. |
+| Audit artifact | Decision Passport JSON | Keeps evidence, reasoning summaries, policy checks, approvals, lifecycle state, and audit events together without storing chain-of-thought. |
+| Evaluation | Seeded synthetic benchmark | Compares deterministic baseline, agentic investigation, and adversarial defense modes against hidden generated labels. |
+
+The model router runs deterministic analysis first for every risk tier. Low-risk cases can use a local summary; medium-risk cases use one configured worker with fallback; high and critical cases can request independent opinions and an adversarial loop. `FRAUD_MODEL_DISAGREEMENT_THRESHOLD` defaults to `0.18`, and `FRAUD_PROVIDER_TIMEOUT_SECONDS` defaults to `8`.
+
+When no provider key is configured, the dashboard and deterministic coded tools still run. High and critical offline investigations use explicitly labelled local heuristic opinions for reproducible disagreement testing. These local opinions are not represented as external model calls.
+
+## Setup
+
+### Prerequisites
+
+- Python 3.12 or newer
+- Git
+- A working Neuro SAN Studio checkout
+- Optional: a Cerebras API key for live Qwen 3.8 27B network conversations
+
+### Windows PowerShell
+
+From the repository root:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e .
+Copy-Item .env.example .env
+```
+
+If PowerShell blocks activation, use the Python executable directly with `.venv\Scripts\python.exe` or allow scripts for the current user with `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+
+### macOS or Linux
 
 ```bash
-uv init
-uv venv
+python3.12 -m venv .venv
 source .venv/bin/activate
-uv add neuro-san-studio
+python -m pip install --upgrade pip
+python -m pip install -e .
+cp .env.example .env
 ```
 
-### Initialize neuro-san-studio
+### Configure Cerebras Qwen 3.8 27B
 
-Run `ns init` to initialize a Neuro SAN Studio project. `ns` stands for Neuro SAN. You can also use the long command
-`neuro-san-studio` instead. It will:
-* let you choose an LLM provider
-* create a `config` folder with your choice of LLM models and plugins configuration
-* create an `mcp` folder with a list of MCP tools
-* create a `registries` folder with a simple agent network and the
-[Agent Network Designer](#agent-network-designer), so you can start designing your own networks right away
-* create `coded_tools` and `middleware` folders with the Python code those agent networks need
+Edit `.env` and set the key without committing the file:
 
-To learn more about the `ns` command run `ns --help`.
+```dotenv
+CEREBRAS_API_KEY=your-cerebras-key
+FRAUD_CEREBRAS_MODEL=qwen-3.8-27b
+FRAUD_CEREBRAS_BASE_URL=https://api.cerebras.ai/v1
+```
+
+The native network reads its provider fallback order from `config/fraud_defense_llm_config.hocon`, where Cerebras Qwen 3.8 27B is primary and Gemini/NVIDIA are fallbacks when configured. The application router reads role settings from `config/fraud_defense_models.json`. Never place a real key in HOCON, JSON, source code, or a commit.
+
+## Run the demo
+
+Start the deterministic dashboard from the repository root:
 
 ```bash
-ns init
+python -m apps.fraud_war_room --port 8090
 ```
 
-```bash
-Which LLM providers do you want to enable?
+Open <http://127.0.0.1:8090>. This dashboard uses seeded synthetic data and does not require a provider key.
 
-#  Provider       Default model
-1  OpenAI         gpt-5.2 (default)
-2  Anthropic      claude-sonnet
-3  Google Gemini  gemini-3-flash
-
-Enter numbers separated by commas (default: 1):
-```
-
-**Note:** To access all Neuro SAN Studio capabilities, clone this repository and follow the setup instructions in the
-[docs/dev_guide.md](docs/dev_guide.md).
-
-### Set your LLM API key(s)
-
-1. Set your provider key, e.g. `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` or `GOOGLE_API_KEY`
-(or create a `.env` file in the current directory).
-See [docs/api_key.md](docs/api_key.md) for details and other providers.
-
-   ```bash
-   export OPENAI_API_KEY="XXX"
-   ```
-
-2. Check your LLM API keys are correctly configured:
-
-    ```bash
-    ns check-llm-keys
-    ```
-
-3. Check your `config/llm_config.hocon` is working:
-
-    ```bash
-    ns check-config
-    ```
-
-    If the configuration is valid you will get a `hello` response from the configured LLMs.
-
-### Import agent networks
-
-`ns init` already installs the Agent Network Designer, so you can start building right away.
-Use `ns import` to add any of the other agent network examples that ship with `neuro-san-studio`.
-
-Run it with no arguments to pick from an interactive list:
-
-```bash
-ns import
-```
-
-Or name a group or a single network directly:
-
-```bash
-ns import basic         # every network in the "basic" group
-ns import hello_world   # a single network
-```
-
-Each imported network brings its dependencies with it -- coded tools, middleware, sub-networks -- and is registered in
-`registries/manifest.hocon`. A running server picks it up within a few seconds.
-
-See [`docs/cli/import.md`](docs/cli/import.md) for the full set of options.
-
-### Start the developer UI
-
-You can start a `neuro-san` server and the `nsflow` UI with the `ns run` command:
+In a second terminal, start the Neuro SAN server and NSFlow:
 
 ```bash
 ns run
 ```
 
-The Neuro SAN server listens on `localhost:8080`.
-
-The nsflow UI is served at
-[http://localhost:4173/](http://localhost:4173/).
-
-Logs land under `logs/` (`server.log`, `nsflow.log`, `thinking_dir/`).
-
-Screenshot:
-
-![NSFlow UI Snapshot](https://raw.githubusercontent.com/cognizant-ai-lab/nsflow/main/docs/snapshot01.png)
-
-### Agent Network Designer
-
-Use the Agent Network Designer to create your own agent network.
-
-1. From the `nsflow` UI, click the `NEW` button at the top, center of the screen.
-![AND Button](docs/images/agent_network_designer_new_button.png)
-2. In the new window that opens, type your prompts in the text box in the bottom right
-corner of the screen. Then Agent Network Designer:
-   * Creates the agents
-   * Links them together
-   * Writes instructions for each agent
-   * Generates a few sample queries you can ask this agent network
-   * Saves the agent network in the `registries/generated` folder
-3. Once the Agent Network Designer is done and comes back with an answer in the chat window,
-you can continue the design by asking it to make changes
-4. Once you're happy with the design, test it! Click the blue `Launch` button at the top
-center of the screen. It opens a new window from which you can chat with the agent network.
-5. If you want to make modifications, go back to the editor window and ask for changes.
-6. You can also edit any agent network by clicking the pen icon next to its name in the main window.
-
-### Import a project from a file / Export to a file
-
-You can import a project from a .hocon file or from a zip file using the `ns import <PATH>`.
+The default server is `http://127.0.0.1:8080` and the default NSFlow UI is <http://127.0.0.1:4173>. If those ports are occupied, use an explicit pair:
 
 ```bash
-ns import ~/Downloads/my_project.hocon
+ns run --server-http-port 8081 --nsflow-port 4175
 ```
 
-Similarly, you can export an agent network and all its dependencies using the `ns export` command:
+Open the UI, select `industry/fraud_defense`, and ask:
+
+```text
+Investigate CASE-0001 and show the full evidence trail.
+```
+
+The dashboard and the Neuro SAN network are complementary: the network explains the investigation, while the dashboard is the controlled action surface for approval, rejection, more investigation, shadow advancement, and passport inspection.
+
+## Recommended judging flow
+
+1. Open the dashboard and select `CASE-0001`, the coordinated payment-fraud campaign.
+2. Show the 18-node network and explain the three independent analyst lanes.
+3. Open the timeline, evidence ledger, relationship graph, competing hypotheses, and model jury.
+4. Compare the candidate controls and show the counterfactual simulation trade-offs.
+5. Point out the governance checks and Decision Passport before taking action.
+6. Approve the recommendation from the dashboard. The lifecycle becomes `SHADOW`, never production.
+7. Introduce the next synthetic attacker variation. Show whether a bypass is detected and whether a revised control is proposed.
+8. Finish on the predicted-versus-observed learning record and the audit passport.
+
+The key innovation is that the attacker is part of the design loop. The system does not stop at detection or recommendation; it challenges the proposed defense, tests it against counterfactuals, requires governed approval, observes it safely, and feeds the result into the next review.
+
+## Local HTTP API
+
+The dashboard server is loopback-only and exposes read-only case inspection plus explicit investigator actions:
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| GET | `/api/health` | Runtime and execution-mode health. |
+| GET | `/api/network` | The 18-node / 17-edge dashboard topology. |
+| GET | `/api/cases` | Synthetic investigator queue. |
+| GET | `/api/bootstrap` | Topology, cases, and the flagship investigation in one response. |
+| GET | `/api/cases/{case_id}` | Full deterministic investigation and Decision Passport. |
+| POST | `/api/cases/{case_id}/approve` | Record an explicit boolean human decision. Approved controls enter `SHADOW`. |
+| POST | `/api/cases/{case_id}/reject` | Reject the recommendation. |
+| POST | `/api/cases/{case_id}/more-investigation` | Request more evidence without changing lifecycle. |
+| POST | `/api/cases/{case_id}/shadow-advance` | Run the next bounded shadow variation after approval. |
+| POST | `/api/benchmark` | Run the reproducible synthetic benchmark and write its artifact. |
+
+POST requests enforce same-origin browser semantics, explicit approval booleans, bounded request bodies, and the human approval lifecycle. The server refuses non-loopback binding because it is a local demo command center, not an internet-facing gateway.
+
+## Evaluation and verification
+
+Run the focused regression suite:
 
 ```bash
-ns export my_project.hocon
+python -m pytest tests/fraud_defense -q
 ```
 
-See [`docs/cli/export.md`](docs/cli/export.md) for details.
+For optional live provider validation, run this command after activating the virtual environment. It performs outbound model calls, so it requires configured provider credentials and network access. The key-free deterministic demo does not need this check:
 
-### Command reference
+```bash
+ns check-config --hocon-path config/fraud_defense_llm_config.hocon
+```
 
-<!-- pyml disable line-length -->
+Run the reproducible benchmark:
 
-| Command             | Purpose                                                          | Key flags                                                                                                                                                                       |
-|---------------------|------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `ns init`           | Scaffold a starter project in the current dir.                   | `--providers openai,anthropic,google`                                                                                                                                           |
-| `ns run`            | Start the Neuro SAN server and nsflow UI.                        | `--server-host`, `--server-http-port`, `--nsflow-port`, `--log-level`, `--client-only`, `--server-only`                                                                         |
-| `ns chat`           | Chat with an agent network directly (no server needed).          | Positional: agent name, `--connection`,  `--host`, `--port`, `--one-shot`, `--list`.                                                                                            |
-| `ns import`         | Import agent networks into the current project.                  | Positional: space-separated group names, network names, or `all`; or local `.hocon` / `.zip` paths (don't mix the two). `--force` to overwrite. Omit args for interactive mode. |
-| `ns export`         | Bundle a network from the current project into a shareable file. | Positional: network name (e.g. `music_nerd` or `basic/music_nerd`). `-o` / `--output` to set the output path. Omit args for interactive picker.                                 |
-| `ns check-llm-keys` | Validate LLM API keys / env vars.                                | `--tier 1` (placeholder), `--tier 2` (format), `--tier 3` (live API call, default)                                                                                              |
-| `ns check-config`   | Validate the LLM configurations in a HOCON file.                 | `--hocon-path` (defaults to `config/llm_config.hocon`)                                                                                                                          |
+```bash
+python -c "from coded_tools.fraud_defense.benchmark import run_benchmark; import json; print(json.dumps(run_benchmark(output_path='artifacts/fraud_benchmark.json'), indent=2))"
+```
 
-<!-- pyml enable line-length -->
+The benchmark defaults to 600 synthetic cases and compares deterministic baseline, agentic investigation, and full adversarial defense modes. Results are reproducible for a fixed seed and are not production performance claims.
 
-Use `ns <command> --help` for the full flag list of any subcommand.
+## Enterprise controls and production boundary
 
----
+The prototype is submission-ready and production-shaped, but it intentionally runs on synthetic data and a local standard-library server. The following controls are implemented in the demo:
 
-## User guide
+- No Cognizant, client, bank, or customer data is shipped.
+- Hidden ground truth remains in the benchmark/workbench layer and is not sent to agents.
+- Deterministic facts are separated from model-generated explanations.
+- Provider failures, timeouts, malformed responses, and disagreement have deterministic fallbacks and explicit status.
+- High and critical recommendations require an explicit human action.
+- Approved controls can enter `SHADOW` only; there is no production execution path.
+- Decision Passports capture audit-relevant summaries without storing chain-of-thought.
+- The local server binds to loopback and constrains static paths and request bodies.
+- API keys are environment-only and the repository contains placeholders, not secrets.
 
-Ready to dive in? Check out the [user guide](docs/user_guide.md) for a detailed overview of the neuro-san library
-and its features.
+A production deployment should place the command center behind an authenticated API gateway and TLS, use a managed secret store, durable encrypted case and passport storage, RBAC with separation of duties, a durable queue for long-running work, structured logs/traces/metrics, retention and deletion policies, provider egress controls, rate limits, CI/CD approvals, and an independent model/risk validation process. Those deployment services are intentionally outside this offline hackathon demo.
 
----
+## Repository map
 
-## Tutorial
+```text
+apps/fraud_war_room/                    Local investigator dashboard and demo server
+apps/fraud_war_room/static/             HTML/CSS/JS deck and downloadable PowerPoint
+coded_tools/fraud_defense/              Synthetic domain, analytics, routing, simulation, and coded tools
+config/fraud_defense_llm_config.hocon   Native Neuro SAN provider fallback configuration
+config/fraud_defense_models.json        Application provider roles and thresholds
+registries/industry/fraud_defense.hocon  18-node canonical Neuro SAN network
+docs/fraud-defense-architecture.md      Architecture decisions and boundaries
+docs/model-routing.md                   Provider routing and fallback behavior
+tests/fraud_defense/                    Unit, HOCON, failure-mode, and deterministic E2E coverage
+artifacts/                               Local benchmark and demo artifacts
+```
 
-For a detailed tutorial, refer to [docs/tutorial.md](docs/tutorial.md).
+## Safety boundary
 
----
-
-## Examples
-
-For examples of agent networks, check out [docs/examples.md](docs/examples.md).
-
----
-
-## Developer Guide
-
-For local development setup and contribution instructions, see the [docs/dev_guide.md](docs/dev_guide.md).
-
----
-
-## Community Projects
-
-### Applications
-
-* [Climate Change](https://github.com/cognizant-ai-lab/neuro-san-cc):
-a tool to answer questions about COP, the Paris Agreement or the Kyoto Protocol using UNFCCC documents.
-* [Enterprise Access Portal](https://github.com/M-Elsaied/enterprise-access-portal):
-an AI-powered multi-agent system for managing enterprise application access requests and IT operations.
-* [F1 fans eval](https://github.com/deepsaia/f1-fan-eval):
-an app that evaluates F1 fan submissions about why they are the biggest F1 fans.
-* [PDF Knowledge Assistant](https://github.com/M-Elsaied/neuro-san-studio/tree/pdf-knowledge-base/apps/pdf_knowledge_assistant):
-a Flask web app that queries PDFs using RAG with topic-based long-term memory synthesis across documents.
-* [Loopy Agents](https://github.com/babakatwork/loopy_agent):
-run Neuro SAN agents continuously or on triggers through a separate service, with asynchronous messaging.
-* [Annual Report Reader](https://github.com/shrushtiimehta/neuro-san-annual-report-reader):
-analyzes a LinkedIn profile and delivers a personalized summary of Cognizant's 2024 Annual Report,
-surfacing content most relevant to the user's industry and seniority level.
-* [Tochiro File Organizer](https://github.com/ofrancon/tochiro):
-a macOS file organization assistant with a dedicated UI to analyze a folder,
-create a plan for moving the files, ask for approval and execute the moves.
-* [Legacy Business-Rule Extractor](https://github.com/Sivakumarraj/neuro-san-legacy-analyzer):
-a 6-agent network that extracts business rules from legacy COBOL, Java, and PL/SQL code,
-pairing deterministic CodedTool parsers with LLM agents to produce a modernization-ready
-specification document.
-
-### Utilities
-
-* [Neuro SAN Web Client](https://github.com/cognizant-ai-lab/neuro-san-web-client):
-a basic Flask web client interface for Neuro SAN.
-* [Neuro SAN Slack app](./apps/slack/README.md)
-a Slack integration that lets you interact with Neuro SAN directly from your workspace.
-
----
-
-## Links
-
-* Website: [Cognizant AI Lab](https://www.cognizant.com/us/en/ai-lab)
-* YouTube: [Decision AI](https://www.youtube.com/@decision-ai)
-* X: [@cognizantailab](https://x.com/cognizantailab)
-* LinkedIn: [Cognizant AI Lab](https://www.linkedin.com/showcase/cognizant-ai-lab)
-* Amazon Marketplace: [Cognizant Neuro SAN](https://aws.amazon.com/marketplace/pp/prodview-z246c4x7j3xb6)
-* Azure Marketplace: [Cognizant Neuro SAN](https://marketplace.microsoft.com/en-us/product/virtual-machine/cognizant.cognizant_neurosanai-application)
-
----
-
-## More details
-
-For more information, check out the [Cognizant AI Lab Neuro SAN landing page](https://www.cognizant.com/us/en/ai-lab/neuro-san).
+This project is a controlled synthetic demonstration. It does not connect to a bank, block a payment, contact a customer, deploy a production control, or make a final fraud decision without an authorized human investigator. Any future production integration must preserve the evidence trail, approval gate, shadow lifecycle, access controls, monitoring, and validation requirements described above.
