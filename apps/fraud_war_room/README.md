@@ -22,7 +22,7 @@ The Neuro SAN network is served by the regular Studio runner:
 ns run
 ```
 
-Open NSFlow and select `fraud_defense` from the network picker. The chat request should include a synthetic case ID, for example `Investigate CASE-0001`. The Neuro SAN chat path requires `GOOGLE_API_KEY` or `NVIDIA_API_KEY` in `.env`; the local dashboard and deterministic coded tools do not require a provider key. The optional multi-provider router reads the role settings in `config/fraud_defense_models.json`.
+Open NSFlow and select the single `industry/fraud_defense` network from the network picker. The chat request should include a synthetic case ID, for example `Investigate CASE-0001`. The native Neuro SAN path uses Cerebras Qwen 3.8 27B when `CEREBRAS_API_KEY` is present, with configured Gemini or NVIDIA fallbacks. The local dashboard and deterministic coded tools do not require a provider key; the model router uses the same Cerebras default and reads the remaining provider settings from `config/fraud_defense_models.json`.
 
 ## Demo flow
 

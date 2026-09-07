@@ -34,6 +34,18 @@ class HoconAndFailureTest(unittest.TestCase):
         self.assertIn('"class": "fraud_defense.neuro_tools.CycleGate"', text)
         self.assertIn('"class": "fraud_defense.neuro_tools.AssembleEvidence"', text)
 
+    def test_native_network_prefers_cerebras_qwen(self):
+        config = Path("config/fraud_defense_llm_config.hocon").read_text(encoding="utf-8")
+        self.assertIn('"class": "coded_tools.fraud_defense.cerebras_chat.CerebrasChatOpenAI"', config)
+        self.assertIn('"model_name": "qwen-3.8-27b"', config)
+
+    def test_fraud_network_has_one_canonical_manifest_entry(self):
+        root_manifest = Path("registries/manifest.hocon").read_text(encoding="utf-8")
+        industry_manifest = Path("registries/industry/manifest.hocon").read_text(encoding="utf-8")
+        self.assertNotIn('"fraud_defense.hocon": true', root_manifest)
+        self.assertEqual(industry_manifest.count('"industry/fraud_defense.hocon": true'), 1)
+        self.assertFalse(Path("registries/fraud_defense.hocon").exists())
+
     def test_cycle_gate_is_bounded(self):
         tool = CycleGate()
         sly_data = {}
@@ -73,6 +85,57 @@ class HoconAndFailureTest(unittest.TestCase):
             router = ModelRouter()
             decision = router.assess({"risk_score": 0.9, "sequence_score": 0.8}, {"component_size": 3, "campaign_signal": True}, RiskLevel.CRITICAL)
         self.assertTrue(decision.assessments)
+        self.assertNotIn("test-key", json.dumps(decision.as_dict()))
+
+    def test_cerebras_defaults_to_qwen_and_normalizes_api_base(self):
+        with patch.dict(os.environ, {"CEREBRAS_API_KEY": "test-key"}, clear=True):
+            router = ModelRouter()
+            config = next(item for item in router.configs if item.name == "cerebras")
+            self.assertEqual(config.model, "qwen-3.8-27b")
+            self.assertEqual(config.base_url, "https://api.cerebras.ai/v1")
+            self.assertTrue(config.enabled)
+
+    def test_cerebras_request_uses_json_mode_and_never_returns_secret(self):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            @staticmethod
+            def read(*_args):
+                return json.dumps(
+                    {
+                        "choices": [
+                            {
+                                "message": {
+                                    "content": json.dumps(
+                                        {
+                                            "hypothesis": "review",
+                                            "confidence": 0.7,
+                                            "rationale_summary": "Signals require review.",
+                                        }
+                                    )
+                                }
+                            }
+                        ]
+                    }
+                ).encode()
+
+        with (
+            patch.dict(os.environ, {"CEREBRAS_API_KEY": "test-key"}, clear=True),
+            patch("coded_tools.fraud_defense.router.urlopen", return_value=FakeResponse()) as mocked_urlopen,
+        ):
+            router = ModelRouter()
+            decision = router.assess({"risk_score": 0.4}, {"component_size": 1}, RiskLevel.MEDIUM)
+
+        request = mocked_urlopen.call_args.args[0]
+        request_payload = json.loads(request.data.decode())
+        self.assertEqual(request.full_url, "https://api.cerebras.ai/v1/chat/completions")
+        self.assertEqual(request_payload["model"], "qwen-3.8-27b")
+        self.assertEqual(request_payload["reasoning_effort"], "none")
+        self.assertEqual(request_payload["response_format"], {"type": "json_object"})
         self.assertNotIn("test-key", json.dumps(decision.as_dict()))
 
 

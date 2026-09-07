@@ -1,5 +1,5 @@
 {
-  "description": "Optional Fraud War Room provider routing. Blank model/base URL values keep the prototype offline.",
+  "description": "Fraud War Room provider routing. Cerebras defaults to the official shared API model when CEREBRAS_API_KEY is present; other providers remain opt-in.",
   "providers": {
     "nvidia": {
       "api_key_env": "NVIDIA_API_KEY",
@@ -11,6 +11,8 @@
       "api_key_env": "CEREBRAS_API_KEY",
       "model_env": "FRAUD_CEREBRAS_MODEL",
       "base_url_env": "FRAUD_CEREBRAS_BASE_URL",
+      "default_model": "qwen-3.8-27b",
+      "default_base_url": "https://api.cerebras.ai/v1",
       "role": "commander, attacker, defender, challenger, final synthesis"
     },
     "gemini": {

@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import time
-import math
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
 from typing import Any
 from typing import Dict
 from typing import List
+from urllib.error import HTTPError
 from urllib.error import URLError
+from urllib.parse import urlparse
+from urllib.parse import urlunparse
 from urllib.request import Request
 from urllib.request import urlopen
 
@@ -30,6 +33,7 @@ class ProviderConfig:
     role: str
     model: str = ""
     base_url: str = ""
+    timeout_seconds: float = 8.0
 
     @property
     def enabled(self) -> bool:
@@ -95,14 +99,46 @@ class RoutingDecision:
 class ModelRouter:
     """Route optional provider-backed judgments and retain safe local opinions.
 
-    The generic HTTP adapter is intentionally opt-in: a provider needs a key,
-    model, and endpoint in the environment. This avoids inventing model IDs or
-    silently sending synthetic case data to an unconfigured service.
+    The generic HTTP adapter is intentionally opt-in: a provider needs a key.
+    Cerebras has a verified model and API default; other providers need their
+    model and endpoint configured explicitly. This avoids silently sending
+    synthetic case data to an unconfigured service.
     """
 
     def __init__(self, disagreement_threshold: float | None = None):
-        self.disagreement_threshold = disagreement_threshold if disagreement_threshold is not None else float(os.getenv("FRAUD_MODEL_DISAGREEMENT_THRESHOLD", "0.18"))
+        configured_threshold = (
+            disagreement_threshold
+            if disagreement_threshold is not None
+            else os.getenv("FRAUD_MODEL_DISAGREEMENT_THRESHOLD", "0.18")
+        )
+        self.disagreement_threshold = self._bounded_float(configured_threshold, 0.18, 0.0, 1.0)
         self.configs = self._load_configs()
+
+    @staticmethod
+    def _bounded_float(value: Any, default: float, minimum: float, maximum: float) -> float:
+        """Parse a finite float and keep operator configuration within safe bounds."""
+        try:
+            parsed = float(value)
+        except (TypeError, ValueError):
+            return default
+        if not math.isfinite(parsed):
+            return default
+        return max(minimum, min(maximum, parsed))
+
+    @staticmethod
+    def _bounded_int(value: Any, default: int, minimum: int, maximum: int) -> int:
+        """Parse an integer and keep request/resource limits bounded."""
+        try:
+            parsed = int(value)
+        except (TypeError, ValueError):
+            return default
+        return max(minimum, min(maximum, parsed))
+
+    @staticmethod
+    def _env_or_default(name: str, default: str) -> str:
+        """Use an explicit environment value, including blank as an opt-out."""
+        value = os.getenv(name)
+        return default if value is None else value.strip()
 
     @staticmethod
     def _load_configs() -> List[ProviderConfig]:
@@ -116,7 +152,13 @@ class ModelRouter:
             ("nvidia", "NVIDIA_API_KEY", "FRAUD_NVIDIA_MODEL", "FRAUD_NVIDIA_BASE_URL", "high-volume worker"),
             ("cerebras", "CEREBRAS_API_KEY", "FRAUD_CEREBRAS_MODEL", "FRAUD_CEREBRAS_BASE_URL", "deep reasoning"),
             ("gemini", "GEMINI_API_KEY", "FRAUD_GEMINI_MODEL", "FRAUD_GEMINI_BASE_URL", "independent review"),
-            ("sarvam", "SARVAM_API_KEY", "FRAUD_SARVAM_MODEL", "FRAUD_SARVAM_BASE_URL", "language and voice extension"),
+            (
+                "sarvam",
+                "SARVAM_API_KEY",
+                "FRAUD_SARVAM_MODEL",
+                "FRAUD_SARVAM_BASE_URL",
+                "language and voice extension",
+            ),
         ]
         config_path = Path(os.getenv("FRAUD_MODEL_CONFIG_PATH", "config/fraud_defense_models.json"))
         if not config_path.is_absolute():
@@ -126,6 +168,15 @@ class ModelRouter:
         except (OSError, TypeError, ValueError):
             file_config = {}
         providers = file_config.get("providers", {}) if isinstance(file_config, dict) else {}
+        default_timeout = ModelRouter._bounded_float(
+            file_config.get("provider_timeout_seconds", 8) if isinstance(file_config, dict) else 8,
+            8.0,
+            1.0,
+            60.0,
+        )
+        configured_timeout = ModelRouter._bounded_float(
+            os.getenv("FRAUD_PROVIDER_TIMEOUT_SECONDS", default_timeout), default_timeout, 1.0, 60.0
+        )
         configs = []
         for name, default_key_env, default_model_env, default_url_env, default_role in definitions:
             override = providers.get(name, {}) if isinstance(providers, dict) else {}
@@ -134,7 +185,23 @@ class ModelRouter:
             model_env = str(override.get("model_env", default_model_env))
             url_env = str(override.get("base_url_env", default_url_env))
             role = str(override.get("role", default_role))
-            configs.append(ProviderConfig(name, key_env, model_env, url_env, role, os.getenv(model_env, ""), os.getenv(url_env, "")))
+            default_model = str(override.get("default_model", ""))
+            default_base_url = str(override.get("default_base_url", ""))
+            timeout_seconds = ModelRouter._bounded_float(
+                override.get("timeout_seconds", configured_timeout), configured_timeout, 1.0, 60.0
+            )
+            configs.append(
+                ProviderConfig(
+                    name,
+                    key_env,
+                    model_env,
+                    url_env,
+                    role,
+                    ModelRouter._env_or_default(model_env, default_model),
+                    ModelRouter._env_or_default(url_env, default_base_url),
+                    timeout_seconds,
+                )
+            )
         return configs
 
     def route(self, level: RiskLevel) -> List[ProviderConfig]:
@@ -165,38 +232,141 @@ class ModelRouter:
         payload = {
             "risk_level": level.value,
             "signals": {key: value for key, value in signals.items() if key != "baseline"},
-            "graph": {key: value for key, value in graph.items() if key in {"component_size", "linked_accounts", "campaign_signal", "central_entities"}},
+            "graph": {
+                key: value
+                for key, value in graph.items()
+                if key in {"component_size", "linked_accounts", "campaign_signal", "central_entities"}
+            },
             "output": "Return JSON with hypothesis, confidence, rationale_summary. Do not include hidden reasoning.",
         }
         return json.dumps(payload, separators=(",", ":"))
 
     @staticmethod
+    def _completion_url(base_url: str) -> str:
+        """Normalize an operator-supplied API base URL to chat completions."""
+        parsed = urlparse(base_url)
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.query or parsed.fragment:
+            raise ValueError("Invalid provider endpoint")
+        path = parsed.path.rstrip("/")
+        if not path.endswith("/chat/completions"):
+            path = f"{path}/chat/completions"
+        return urlunparse(parsed._replace(path=path))
+
+    @staticmethod
+    def _parse_content(content: Any) -> Dict[str, Any]:
+        """Parse JSON mode output while tolerating a fenced response from a proxy."""
+        if not isinstance(content, str):
+            raise ValueError("Provider returned no textual assessment")
+        normalized = content.strip()
+        if normalized.startswith("```") and normalized.endswith("```"):
+            normalized = normalized[3:-3].strip()
+            if normalized.lower().startswith("json"):
+                normalized = normalized[4:].lstrip()
+        parsed = json.loads(normalized)
+        if not isinstance(parsed, dict):
+            raise ValueError("Provider assessment must be a JSON object")
+        return parsed
+
+    @staticmethod
     def _call_provider(config: ProviderConfig, prompt: str) -> ModelAssessment:
-        """Call an explicitly configured OpenAI-compatible endpoint."""
+        """Call an explicitly configured OpenAI-compatible endpoint safely."""
         started = time.perf_counter()
-        request = Request(
-            config.base_url,
-            data=json.dumps({"model": config.model, "messages": [{"role": "user", "content": prompt}], "temperature": 0}).encode("utf-8"),
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {config.api_key_value}"},
-            method="POST",
-        )
+        payload: Dict[str, Any] = {
+            "model": config.model,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "Return only a JSON object with hypothesis, confidence, and "
+                        "rationale_summary. Do not reveal chain of thought."
+                    ),
+                },
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0,
+            "max_completion_tokens": ModelRouter._bounded_int(
+                os.getenv("FRAUD_PROVIDER_MAX_COMPLETION_TOKENS", "256"), 256, 32, 1024
+            ),
+        }
+        if config.name == "cerebras":
+            # Cerebras documents these parameters for qwen-3.8-27b. JSON mode
+            # keeps the provider response inside the validated assessment schema.
+            payload["reasoning_effort"] = "none"
+            payload["response_format"] = {"type": "json_object"}
         try:
-            with urlopen(request, timeout=float(os.getenv("FRAUD_PROVIDER_TIMEOUT_SECONDS", "8"))) as response:  # nosec B310 - endpoint is explicit operator configuration
-                payload = json.loads(response.read().decode("utf-8"))
-            content = payload.get("choices", [{}])[0].get("message", {}).get("content", "")
-            if not content and payload.get("candidates"):
-                content = payload["candidates"][0].get("content", {}).get("parts", [{}])[0].get("text", "")
-            parsed = json.loads(content) if isinstance(content, str) else content
-            if not isinstance(parsed, dict) or not isinstance(parsed.get("hypothesis"), str) or not parsed["hypothesis"].strip():
+            request = Request(
+                ModelRouter._completion_url(config.base_url),
+                data=json.dumps(payload, separators=(",", ":")).encode("utf-8"),
+                headers={
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {config.api_key_value}",
+                    "User-Agent": "neuro-san-studio/fraud-war-room",
+                },
+                method="POST",
+            )
+            max_response_bytes = ModelRouter._bounded_int(
+                os.getenv("FRAUD_PROVIDER_MAX_RESPONSE_BYTES", "65536"), 65536, 1024, 1048576
+            )
+            with urlopen(  # nosec B310 - endpoint is explicit operator configuration
+                request, timeout=config.timeout_seconds
+            ) as response:
+                raw_response = response.read(max_response_bytes + 1)
+            if len(raw_response) > max_response_bytes:
+                raise ValueError("Provider response too large")
+            response_payload = json.loads(raw_response.decode("utf-8"))
+            content = response_payload.get("choices", [{}])[0].get("message", {}).get("content", "")
+            if not content and response_payload.get("candidates"):
+                content = response_payload["candidates"][0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            parsed = ModelRouter._parse_content(content)
+            hypothesis = str(parsed.get("hypothesis", "")).strip()
+            if not hypothesis:
                 raise ValueError("Malformed provider assessment")
             if not isinstance(parsed.get("confidence"), (int, float)) or isinstance(parsed["confidence"], bool) or not math.isfinite(parsed["confidence"]) or not 0 <= parsed["confidence"] <= 1:
                 raise ValueError("Invalid provider confidence")
-            hypothesis = str(parsed.get("hypothesis", "unusual activity"))
             confidence = max(0.0, min(1.0, float(parsed.get("confidence", 0.5))))
             rationale = str(parsed.get("rationale_summary", "Provider returned a concise assessment."))[:400]
-            return ModelAssessment(config.name, config.model, hypothesis, confidence, rationale, "provider", int((time.perf_counter() - started) * 1000))
-        except (OSError, ValueError, KeyError, TypeError, AttributeError, IndexError) as exc:
-            return ModelAssessment(config.name, config.model, "provider unavailable", 0.0, "Provider call failed; fallback was used.", "error", int((time.perf_counter() - started) * 1000), type(exc).__name__)
+            return ModelAssessment(
+                config.name,
+                config.model,
+                hypothesis[:200],
+                confidence,
+                rationale,
+                "provider",
+                int((time.perf_counter() - started) * 1000),
+            )
+        except HTTPError as exc:
+            return ModelAssessment(
+                config.name,
+                config.model,
+                "provider unavailable",
+                0.0,
+                "Provider call failed; fallback was used.",
+                "error",
+                int((time.perf_counter() - started) * 1000),
+                f"http_{exc.code}",
+            )
+        except (
+            URLError,
+            TimeoutError,
+            OSError,
+            UnicodeError,
+            ValueError,
+            KeyError,
+            TypeError,
+            AttributeError,
+            IndexError,
+        ) as exc:
+            return ModelAssessment(
+                config.name,
+                config.model,
+                "provider unavailable",
+                0.0,
+                "Provider call failed; fallback was used.",
+                "error",
+                int((time.perf_counter() - started) * 1000),
+                type(exc).__name__,
+            )
 
     def assess(self, signals: Dict[str, Any], graph: Dict[str, Any], level: RiskLevel) -> RoutingDecision:
         """Produce one or more independent assessments and trigger disagreement."""

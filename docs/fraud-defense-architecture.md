@@ -28,7 +28,7 @@ The application is an isolated `coded_tools.fraud_defense` domain package plus a
 ## Files to create
 
 - `coded_tools/fraud_defense/` — domain models, generator, analytics/graph, risk, simulation, routing, orchestration, passport, learning, and Neuro SAN coded tools.
-- `config/fraud_defense_llm_config.hocon` — Fraud War Room's Neuro SAN provider fallback configuration (Gemini first, NVIDIA second; credentials remain in the environment).
+- `config/fraud_defense_llm_config.hocon` — Fraud War Room's Neuro SAN provider fallback configuration (Cerebras Qwen 3.8 27B first, Gemini and NVIDIA next; credentials remain in the environment).
 - `registries/industry/fraud_defense.hocon` — actual Neuro SAN HOCON agent network with specialized nodes and bounded adversarial cycle.
 - `apps/fraud_war_room/` — local command-center server and static UI.
 - `tests/fraud_defense/` — unit, HOCON structure, failure-mode, and end-to-end deterministic tests.
@@ -37,7 +37,7 @@ The application is an isolated `coded_tools.fraud_defense` domain package plus a
 ## Files to modify
 
 - `registries/industry/manifest.hocon` — serve the Fraud War Room network.
-- `registries/manifest.hocon` — add the flat `fraud_defense.hocon` alias used by NSFlow's local picker while retaining the grouped server network.
+- `registries/manifest.hocon` and `registries/industry/manifest.hocon` — expose one canonical `industry/fraud_defense.hocon` network entry.
 - `registries/industry/README.md` — not present; no framework README is replaced. The root README receives a link to the application README.
 - `.env.example` — add fraud-specific placeholders without secrets.
 - `requirements.txt` — keep the core dependency set lightweight; no graph/database dependency is required for the prototype.
@@ -55,7 +55,7 @@ The application is an isolated `coded_tools.fraud_defense` domain package plus a
 - Low risk: deterministic analytics and local rule summary; optionally one configured fast provider.
 - Medium risk: deterministic evidence first, then configured NVIDIA reasoning with fallback.
 - High/critical: independent configured provider opinions (NVIDIA, Cerebras, Gemini when available), disagreement threshold, extra evidence, attacker/defender simulation, challenger, governance, and human approval.
-- Neuro SAN uses verified package-supported Gemini/NVIDIA model aliases from `config/fraud_defense_llm_config.hocon`; credentials are read only from `GOOGLE_API_KEY` and `NVIDIA_API_KEY`. The independent application router keeps model IDs/endpoints environment-configurable for optional NVIDIA, Cerebras, Gemini, and Sarvam calls.
+- The independent application router and the native Neuro SAN network use Cerebras Qwen 3.8 27B by default when `CEREBRAS_API_KEY` is configured, while keeping model IDs and endpoints environment-configurable for NVIDIA, Gemini, and Sarvam. Gemini and NVIDIA remain fallbacks for the native network.
 
 ## Data strategy
 
