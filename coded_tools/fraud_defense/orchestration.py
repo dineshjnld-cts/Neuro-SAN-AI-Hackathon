@@ -26,9 +26,12 @@ from coded_tools.fraud_defense.simulation import default_defenses
 
 
 NETWORK_AGENTS = [
-    "fraud_commander", "transaction_analyst", "customer_analyst", "entity_graph_analyst", "timeline_process_analyst",
-    "evidence_analyst", "hypothesis_generator", "attack_reconstructor", "attacker_agent", "defender_agent",
-    "counterfactual_simulator", "adversarial_challenger", "model_router", "policy_governance", "decision_governor", "outcome_learning",
+    "fraud_commander", "case_intake", "triage_router", "run_case_review",
+    "behavioral_signals", "relationship_forensics", "customer_baseline",
+    "evidence_synthesizer", "hypothesis_lab", "adversary_in_residence",
+    "defense_architect", "counterfactual_simulator", "model_jury",
+    "governance_gate", "decision_passport", "human_approval_gate",
+    "shadow_observer", "outcome_learner",
 ]
 
 

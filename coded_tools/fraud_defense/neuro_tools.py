@@ -272,6 +272,80 @@ class RecordOutcome(FraudWorkbenchTool):
                 "reason": "Record approval and outcomes through the investigator interface."}
 
 
+class RunCaseReview(FraudWorkbenchTool):
+    """Run the complete deterministic review and return a chat-sized packet."""
+
+    action = "case_review"
+
+    def run_action(self, engine: FraudDefenseEngine, case_id: str, args: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            configured_rounds = int(os.getenv("FRAUD_MAX_ATTACK_ROUNDS", "3"))
+            max_attack_rounds = int(args.get("max_attack_rounds", configured_rounds))
+        except (TypeError, ValueError) as exc:
+            raise ValueError("max_attack_rounds must be an integer") from exc
+        max_attack_rounds = max(1, min(6, max_attack_rounds))
+
+        result = engine.investigate(case_id, max_attack_rounds=max_attack_rounds)
+        evidence = result.get("evidence", {})
+        routing = result.get("model_routing", {})
+        disagreement = routing.get("disagreement", {})
+        governance = result.get("governance", {})
+        passport = result.get("decision_passport", {})
+        attack = result.get("attacker_analysis", {})
+        selected = result.get("selected_defense") or {}
+        simulations = result.get("simulation_results") or []
+        selected_simulation = simulations[0] if simulations else {}
+
+        control_keys = ("control_id", "name", "action", "conditions", "rationale", "lifecycle")
+        simulation_keys = (
+            "control_id", "control_name", "fraud_prevented_rate", "false_positive_rate",
+            "customer_friction", "utility", "attack_success_rate",
+        )
+        assessments = routing.get("assessments", [])
+        phases = [
+            {"phase": "DETECT", "status": "completed"},
+            {"phase": "INVESTIGATE", "status": "completed"},
+            {"phase": "CHALLENGE", "status": "completed"},
+            {"phase": "DEFEND", "status": "completed" if selected else "not_required"},
+            {"phase": "GOVERN", "status": "completed"},
+            {"phase": "DECIDE", "status": "completed"},
+        ]
+        return {
+            "case_id": result["case_id"],
+            "risk_level": result["risk_level"],
+            "risk_score": result["risk_score"],
+            "confidence": result.get("confidence"),
+            "decision": result["decision"],
+            "recommended_control": {key: selected[key] for key in control_keys if key in selected},
+            "reason_codes": passport.get("reason_codes", result.get("signals", {}).get("reason_codes", [])),
+            "supporting_evidence": [item["fact"] for item in evidence.get("supporting", [])[:5] if "fact" in item],
+            "counter_evidence": [item["fact"] for item in evidence.get("counter", [])[:3] if "fact" in item],
+            "open_questions": [item["fact"] for item in evidence.get("missing", [])[:3] if "fact" in item],
+            "simulation": {key: selected_simulation[key] for key in simulation_keys if key in selected_simulation},
+            "adversarial_review": {
+                "rounds": attack.get("iterations_executed", 0),
+                "converged": attack.get("converged", True),
+                "status": "completed",
+            },
+            "model_review": {
+                "providers": [item.get("provider") for item in assessments if item.get("provider")],
+                "disagreement": disagreement.get("triggered", False),
+                "action": disagreement.get("action", "no_extra_review"),
+            },
+            "governance": {
+                "all_passed": governance.get("all_passed", False),
+                "human_approval_required": governance.get("human_approval_required", True),
+                "failed_checks": governance.get("failed_checks", []),
+            },
+            "audit": {
+                "decision_id": passport.get("decision_id"),
+                "passport_reference": passport.get("decision_id"),
+                "lifecycle": result.get("deployment", {}).get("lifecycle", "RECOMMEND"),
+            },
+            "workflow": phases,
+        }
+
+
 class CycleGate(FraudWorkbenchTool):
     """Bound the HOCON attacker/defender/challenger cycle."""
 
@@ -305,5 +379,6 @@ TOOL_CLASSES: Dict[str, Type[FraudWorkbenchTool]] = {
     "CheckGovernance": CheckGovernance,
     "CreateDecisionPassport": CreateDecisionPassport,
     "RecordOutcome": RecordOutcome,
+    "RunCaseReview": RunCaseReview,
     "CycleGate": CycleGate,
 }

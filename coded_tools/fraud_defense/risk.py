@@ -26,9 +26,9 @@ def risk_level(score: float, thresholds: Dict[str, float] | None = None) -> Risk
 def investigation_plan(level: RiskLevel) -> Dict[str, Any]:
     """Return the bounded set of work appropriate for a risk tier."""
     if level == RiskLevel.LOW:
-        return {"agents": ["transaction_analyst"], "models": 1, "approval_required": False, "simulation_required": False}
+        return {"agents": ["case_investigation"], "models": 1, "approval_required": False, "simulation_required": False}
     if level == RiskLevel.MEDIUM:
-        return {"agents": ["transaction_analyst", "entity_graph_analyst", "evidence_analyst", "adversarial_challenger"], "models": 1, "approval_required": False, "simulation_required": True}
+        return {"agents": ["case_investigation", "control_assurance"], "models": 1, "approval_required": False, "simulation_required": True}
     if level == RiskLevel.HIGH:
-        return {"agents": ["transaction_analyst", "customer_analyst", "entity_graph_analyst", "timeline_process_analyst", "evidence_analyst", "hypothesis_generator", "attack_reconstructor", "attacker_agent", "defender_agent", "counterfactual_simulator", "adversarial_challenger", "policy_governance", "decision_governor"], "models": 3, "approval_required": True, "simulation_required": True}
-    return {"agents": ["fraud_commander", "transaction_analyst", "customer_analyst", "entity_graph_analyst", "timeline_process_analyst", "evidence_analyst", "hypothesis_generator", "attack_reconstructor", "attacker_agent", "defender_agent", "counterfactual_simulator", "adversarial_challenger", "model_router", "policy_governance", "decision_governor", "outcome_learning"], "models": 3, "approval_required": True, "simulation_required": True, "autonomous_execution": False}
+        return {"agents": ["case_investigation", "control_assurance", "decision_governance"], "models": 3, "approval_required": True, "simulation_required": True}
+    return {"agents": ["case_investigation", "control_assurance", "decision_governance", "human_approval"], "models": 3, "approval_required": True, "simulation_required": True, "autonomous_execution": False}

@@ -17,6 +17,7 @@ from coded_tools.fraud_defense.neuro_tools import GenerateHypotheses
 from coded_tools.fraud_defense.neuro_tools import GetCaseContext
 from coded_tools.fraud_defense.neuro_tools import ProposeDefenses
 from coded_tools.fraud_defense.neuro_tools import RouteModels
+from coded_tools.fraud_defense.neuro_tools import RunCaseReview
 from coded_tools.fraud_defense.neuro_tools import SimulateDefenses
 from coded_tools.fraud_defense.models import RiskLevel
 from coded_tools.fraud_defense.router import ModelRouter
@@ -25,14 +26,27 @@ from coded_tools.fraud_defense.router import ModelRouter
 class HoconAndFailureTest(unittest.TestCase):
     """Keep the actual HOCON network visible and failure-safe."""
 
-    def test_hocon_declares_required_agents_and_cycle(self):
+    def test_hocon_declares_visible_investigation_lattice(self):
         path = Path("registries/industry/fraud_defense.hocon")
         text = path.read_text(encoding="utf-8")
-        for name in ("fraud_commander", "transaction_analyst", "attacker_agent", "defender_agent", "counterfactual_simulator", "adversarial_challenger", "model_router", "decision_governor"):
+        expected_nodes = (
+            "fraud_commander", "case_intake", "run_case_review", "triage_router",
+            "behavioral_signals", "relationship_forensics", "customer_baseline",
+            "evidence_synthesizer", "hypothesis_lab", "adversary_in_residence",
+            "defense_architect", "counterfactual_simulator", "model_jury",
+            "governance_gate", "decision_passport", "human_approval_gate",
+            "shadow_observer", "outcome_learner",
+        )
+        for name in expected_nodes:
             self.assertIn(f'"name": "{name}"', text)
-        self.assertIn('"tools": ["cycle_gate", "attacker_challenge", "defender_agent"', text)
-        self.assertIn('"class": "fraud_defense.neuro_tools.CycleGate"', text)
-        self.assertIn('"class": "fraud_defense.neuro_tools.AssembleEvidence"', text)
+        self.assertEqual(text.count('"name": "'), len(expected_nodes))
+        self.assertIn('"class": "coded_tools.fraud_defense.neuro_tools.RunCaseReview"', text)
+        self.assertIn('"max_steps": 24', text)
+        self.assertIn('"tools": ["run_case_review", "behavioral_signals", "relationship_forensics", "customer_baseline", "evidence_synthesizer"]', text)
+        self.assertIn('"tools": ["triage_router"]', text)
+        self.assertIn('"tools": ["hypothesis_lab"]', text)
+        self.assertIn('"tools": ["adversary_in_residence"]', text)
+        self.assertIn('"tools": ["shadow_observer"]', text)
 
     def test_native_network_prefers_cerebras_qwen(self):
         config = Path("config/fraud_defense_llm_config.hocon").read_text(encoding="utf-8")
@@ -79,6 +93,14 @@ class HoconAndFailureTest(unittest.TestCase):
         self.assertIn("model_routing", sly_data["fraud_war_room"])
         self.assertIn("decision_passport", sly_data)
         self.assertEqual(sly_data["decision_passport"]["case_id"], "CASE-0001")
+
+    def test_case_review_returns_compact_investigator_packet(self):
+        result = asyncio.run(RunCaseReview().async_invoke({"case_id": "CASE-0001"}, {}))
+        self.assertNotIn("error", result)
+        self.assertEqual(result["case_id"], "CASE-0001")
+        self.assertIn("recommended_control", result)
+        self.assertIn("workflow", result)
+        self.assertNotIn("transaction_analyst", json.dumps(result))
 
     def test_provider_failure_falls_back_without_secret_in_result(self):
         with patch.dict(os.environ, {"FRAUD_NVIDIA_MODEL": "test-model", "FRAUD_NVIDIA_BASE_URL": "http://127.0.0.1:1", "NVIDIA_API_KEY": "test-key"}, clear=False):

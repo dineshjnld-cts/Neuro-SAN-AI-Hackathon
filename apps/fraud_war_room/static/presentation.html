@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Fraud Defense Autonomy Engine hackathon presentation deck">
+  <title>Fraud Defense Autonomy Engine | Presentation</title>
+  <link rel="stylesheet" href="presentation.css">
+</head>
+<body>
+  <div class="deck-shell">
+    <header class="deck-topbar">
+      <a class="deck-brand" href="/" aria-label="Return to Fraud War Room">
+        <span class="brand-mark">FW</span>
+        <span><strong>FRAUD WAR ROOM</strong><small>Autonomy Engine / Hackathon Deck</small></span>
+      </a>
+      <div class="deck-meta">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span id="slideLabel">01 / 06</span>
+        <span class="deck-divider" aria-hidden="true"></span>
+        <button class="utility-button" id="fullscreenButton" type="button" title="Toggle fullscreen">FULLSCREEN</button>
+      </div>
+    </header>
+
+    <main class="slides" id="slides" aria-live="polite">
+      <section class="slide slide-hero is-active" data-slide="1" id="slide-1" aria-labelledby="slide-title-1">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="eyebrow-line"></span> COGNIZANT NA BFS / HACKATHON SUBMISSION</div>
+            <h1 id="slide-title-1">Fraud Defense<br><em>Autonomy Engine</em></h1>
+            <p class="hero-lede">A governed investigation loop that finds the signal, invites the attacker, tests the defense, and earns the right to act.</p>
+            <div class="hero-actions">
+              <a class="button button-quiet" href="/static/Fraud_Defense_Autonomy_Engine_Submission.pptx" download>Download PowerPoint</a>
+              <a class="button button-primary" href="/" target="_blank" rel="noreferrer">Open live War Room <span>↗</span></a>
+              <button class="button button-quiet" type="button" data-next>Start the story <span>→</span></button>
+            </div>
+            <div class="hero-footnote"><span class="pulse"></span> Synthetic banking environment · 600 reproducible cases · zero production execution</div>
+          </div>
+          <div class="hero-orbit" aria-label="Closed-loop fraud defense cycle">
+            <div class="orbit-glow"></div>
+            <div class="orbit-ring orbit-ring-outer"></div>
+            <div class="orbit-ring orbit-ring-inner"></div>
+            <div class="orbit-core"><span>CASE</span><strong>0001</strong><small>CRITICAL</small></div>
+            <div class="orbit-node orbit-node-a"><span>01</span><strong>DETECT</strong></div>
+            <div class="orbit-node orbit-node-b"><span>02</span><strong>UNDERSTAND</strong></div>
+            <div class="orbit-node orbit-node-c"><span>03</span><strong>CHALLENGE</strong></div>
+            <div class="orbit-node orbit-node-d"><span>04</span><strong>DEFEND</strong></div>
+            <div class="orbit-node orbit-node-e"><span>05</span><strong>LEARN</strong></div>
+            <div class="orbit-arrow">↻</div>
+          </div>
+        </div>
+        <div class="hero-ribbon"><span>THE THESIS</span><strong>Detection is only the beginning.</strong><span>Our system asks what the attacker does next.</span></div>
+      </section>
+
+      <section class="slide" data-slide="2" id="slide-2" aria-labelledby="slide-title-2">
+        <div class="slide-heading">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> 01 / THE PROBLEM</div><h2 id="slide-title-2">Fraud teams see the alert.<br><em>They still need the story.</em></h2></div>
+          <p class="heading-aside">Modern fraud is coordinated, adaptive, and expensive to explain after the fact. A single score cannot carry the investigation.</p>
+        </div>
+        <div class="problem-layout">
+          <div class="problem-stack">
+            <article class="problem-card problem-card-red"><span class="card-index">01</span><div><h3>Score without context</h3><p>Rules and models flag anomalies, but investigators must reconstruct the customer, device, beneficiary, sequence, and network story by hand.</p></div><span class="card-mark">↗</span></article>
+            <article class="problem-card problem-card-amber"><span class="card-index">02</span><div><h3>Controls without a sparring partner</h3><p>A control may stop fraud while creating false positives, customer friction, or a new bypass. Most workflows discover that too late.</p></div><span class="card-mark">↗</span></article>
+            <article class="problem-card problem-card-blue"><span class="card-index">03</span><div><h3>Decisions without a defensible trail</h3><p>Evidence, dissent, approval, and outcomes live across tools. The audit question arrives after the decision.</p></div><span class="card-mark">↗</span></article>
+          </div>
+          <aside class="problem-callout">
+            <div class="callout-kicker">THE GAP</div>
+            <div class="callout-number">1 → ∞</div>
+            <h3>One alert becomes<br>a living investigation.</h3>
+            <p>When the fraud pattern changes, the defense must learn without turning a production customer into the experiment.</p>
+            <div class="signal-row"><span class="signal-bar signal-bar-red"></span><span>Reactive detection</span></div>
+            <div class="signal-row"><span class="signal-bar signal-bar-amber"></span><span>Manual investigation</span></div>
+            <div class="signal-row"><span class="signal-bar signal-bar-teal"></span><span>Governed autonomy</span></div>
+          </aside>
+        </div>
+        <div class="bottom-line"><strong>Design requirement</strong><span>Find the signal · explain the signal · attack the defense · approve with evidence · observe safely</span></div>
+      </section>
+
+      <section class="slide" data-slide="3" id="slide-3" aria-labelledby="slide-title-3">
+        <div class="slide-heading">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> 02 / OUR SOLUTION</div><h2 id="slide-title-3">A closed loop for<br><em>defense that gets smarter.</em></h2></div>
+          <p class="heading-aside">We combine deterministic evidence with multi-agent reasoning, then put the proposed control through an adversarial rehearsal before a human sees the decision.</p>
+        </div>
+        <div class="solution-loop">
+          <div class="loop-stage"><span>01</span><strong>DETECT</strong><small>Signals & alerts</small></div><div class="loop-connector">→</div>
+          <div class="loop-stage"><span>02</span><strong>UNDERSTAND</strong><small>Evidence ledger</small></div><div class="loop-connector">→</div>
+          <div class="loop-stage stage-accent"><span>03</span><strong>CHALLENGE</strong><small>Attacker-in-residence</small></div><div class="loop-connector">→</div>
+          <div class="loop-stage"><span>04</span><strong>DEFEND</strong><small>Counterfactual controls</small></div><div class="loop-connector">→</div>
+          <div class="loop-stage"><span>05</span><strong>LEARN</strong><small>Shadow outcomes</small></div>
+        </div>
+        <div class="differentiator-grid">
+          <article class="differentiator"><div class="diff-icon">⌁</div><div><div class="diff-kicker">01 / DETERMINISTIC CORE</div><h3>Facts stay grounded</h3><p>Seeded synthetic data, exact analytics, graph traversal, simulations, and policy checks create a reproducible source of truth.</p></div></article>
+          <article class="differentiator diff-highlight"><div class="diff-icon">⚔</div><div><div class="diff-kicker">02 / ADVERSARIAL BY DESIGN</div><h3>The attacker gets a seat</h3><p>Adversary-in-Residence creates a bounded bypass scenario. A defense is selected only after it survives the counterfactual lab.</p></div></article>
+          <article class="differentiator"><div class="diff-icon">◎</div><div><div class="diff-kicker">03 / GOVERNED AUTONOMY</div><h3>Earn the right to act</h3><p>Model disagreement is preserved, a Decision Passport is created, and approved controls enter SHADOW before any production path.</p></div></article>
+        </div>
+        <div class="quote-strip"><span class="quote-mark">“</span><strong>Autonomy is not automatic execution.</strong><span>It is a system that knows when to investigate, when to challenge, and when to ask a human.</span></div>
+      </section>
+
+      <section class="slide slide-flow" data-slide="4" id="slide-4" aria-labelledby="slide-title-4">
+        <div class="slide-heading">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> 03 / HOW IT WORKS</div><h2 id="slide-title-4">One alert. Three lenses.<br><em>One governed decision.</em></h2></div>
+          <div class="node-counter"><strong>18</strong><span>visible<br>nodes</span><i></i><strong>17</strong><span>directed<br>handoffs</span></div>
+        </div>
+        <div class="flow-board">
+          <div class="flow-row flow-row-primary"><div class="flow-node node-command"><span>01</span><strong>Fraud<br>Commander</strong><small>single interface</small></div><div class="flow-arrow">→</div><div class="flow-node"><span>02</span><strong>Signal<br>Intake</strong><small>scope the case</small></div><div class="flow-arrow">→</div><div class="flow-node"><span>03</span><strong>Triage<br>Router</strong><small>fan out evidence</small></div><div class="flow-arrow">→</div><div class="flow-node node-code"><span>04</span><strong>Case<br>Packet</strong><small>deterministic facts</small></div></div>
+          <div class="flow-branch-label"><span>THREE INDEPENDENT ANALYST LANES</span><i></i><span>NO SINGLE SCORE DECIDES</span></div>
+          <div class="flow-row flow-row-branches"><div class="flow-node branch-behavior"><span>05</span><strong>Behavioral<br>Signal Lab</strong><small>sequence & novelty</small></div><div class="flow-node branch-graph"><span>06</span><strong>Relationship<br>Forensics</strong><small>graph & campaign</small></div><div class="flow-node branch-customer"><span>07</span><strong>Customer<br>Baseline</strong><small>authorized alternatives</small></div></div>
+          <div class="flow-merge">↓ <span>evidence is reconciled</span> ↓</div>
+          <div class="flow-row flow-row-secondary"><div class="flow-node"><span>08</span><strong>Evidence<br>Librarian</strong><small>support / counter / missing</small></div><div class="flow-arrow">→</div><div class="flow-node node-challenge"><span>09</span><strong>Hypothesis<br>Lab</strong><small>competing explanations</small></div><div class="flow-arrow">→</div><div class="flow-node node-challenge"><span>10</span><strong>Adversary<br>in Residence</strong><small>bounded bypass</small></div><div class="flow-arrow">→</div><div class="flow-node node-defend"><span>11</span><strong>Defense<br>Architect</strong><small>proportional controls</small></div></div>
+          <div class="flow-row flow-row-secondary"><div class="flow-node node-sim"><span>12</span><strong>Counterfactual<br>Simulator</strong><small>fraud / friction / utility</small></div><div class="flow-arrow">→</div><div class="flow-node node-jury"><span>13</span><strong>Independent<br>Model Jury</strong><small>preserve dissent</small></div><div class="flow-arrow">→</div><div class="flow-node node-govern"><span>14</span><strong>Governance<br>Gate</strong><small>policy checks</small></div><div class="flow-arrow">→</div><div class="flow-node node-passport"><span>15</span><strong>Decision<br>Passport</strong><small>audit artifact</small></div></div>
+          <div class="flow-row flow-row-lifecycle"><div class="flow-node node-human"><span>16</span><strong>Human<br>Approval</strong><small>explicit decision</small></div><div class="flow-arrow">→</div><div class="flow-node node-shadow"><span>17</span><strong>Shadow<br>Observer</strong><small>safe rehearsal</small></div><div class="flow-arrow">→</div><div class="flow-node node-learn"><span>18</span><strong>Outcome<br>Learning</strong><small>predicted vs observed</small></div></div>
+        </div>
+        <div class="flow-caption"><span class="pulse"></span><strong>The unique move:</strong> the system does not stop at “fraud likely.” It tests “will our control still work when the attacker adapts?”</div>
+      </section>
+
+      <section class="slide" data-slide="5" id="slide-5" aria-labelledby="slide-title-5">
+        <div class="slide-heading">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> 04 / ARCHITECTURE & TECHNOLOGY</div><h2 id="slide-title-5">Built for a demo.<br><em>Designed like a control plane.</em></h2></div>
+          <p class="heading-aside">Every layer has a job: the LLM coordinates and explains; coded tools calculate; governance controls the boundary.</p>
+        </div>
+        <div class="architecture-grid">
+          <div class="architecture-stack">
+            <article class="arch-layer arch-experience"><div class="arch-number">01</div><div><span>EXPERIENCE</span><strong>NSFlow + Fraud War Room</strong><small>Investigator chat, alert queue, entity graph, defense lab, lifecycle controls</small></div><b>↗</b></article>
+            <article class="arch-layer arch-orchestration"><div class="arch-number">02</div><div><span>ORCHESTRATION</span><strong>Neuro SAN + HOCON</strong><small>18 named nodes, directed handoffs, bounded steps, protected sly_data</small></div><b>↗</b></article>
+            <article class="arch-layer arch-intelligence"><div class="arch-number">03</div><div><span>MODEL INTELLIGENCE</span><strong>Cerebras API · Qwen 3.8 27B</strong><small>OpenAI-compatible adapter with JSON mode; Gemini / NVIDIA fallbacks</small></div><b>↗</b></article>
+            <article class="arch-layer arch-core"><div class="arch-number">04</div><div><span>DETERMINISTIC CORE</span><strong>Python coded tools</strong><small>Synthetic generator, signals, graph forensics, simulation, policy, passport, learning</small></div><b>↗</b></article>
+            <article class="arch-layer arch-governance"><div class="arch-number">05</div><div><span>CONTROL BOUNDARY</span><strong>Human approval → SHADOW → learn</strong><small>No autonomous production execution. Secrets stay in environment configuration.</small></div><b>↗</b></article>
+          </div>
+          <aside class="tech-panel">
+            <div class="callout-kicker">TECH STACK</div>
+            <div class="tech-tags"><span>Python 3.12+</span><span>Neuro SAN 0.7</span><span>NSFlow</span><span>HOCON</span><span>LangChain OpenAI</span><span>Cerebras API</span><span>Qwen 3.8 27B</span><span>HTTP server</span><span>SVG / CSS / JS</span><span>pytest</span></div>
+            <div class="stack-divider"></div>
+            <div class="callout-kicker">PRODUCTION-MINDED SAFEGUARDS</div>
+            <ul class="safeguard-list"><li><i>✓</i> Bounded timeouts, retries, steps, and response sizes</li><li><i>✓</i> JSON output validation and provider-safe fallback</li><li><i>✓</i> No secrets in HOCON, prompts, or audit results</li><li><i>✓</i> Counter-evidence and model dissent remain visible</li><li><i>✓</i> Human approval required for high-risk decisions</li></ul>
+          </aside>
+        </div>
+        <div class="architecture-foot"><span class="pulse"></span><strong>Offline by default.</strong><span>The deterministic workbench runs without a provider key. Add CEREBRAS_API_KEY to activate Qwen-backed opinions.</span></div>
+      </section>
+
+      <section class="slide slide-demo" data-slide="6" id="slide-6" aria-labelledby="slide-title-6">
+        <div class="slide-heading">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> 05 / LIVE DEMO & IMPACT</div><h2 id="slide-title-6">Turn CASE-0001 into<br><em>the proof point.</em></h2></div>
+          <p class="heading-aside">A five-minute walkthrough makes the innovation visible: evidence, challenge, control economics, governance, and learning in one loop.</p>
+        </div>
+        <div class="demo-layout">
+          <div class="demo-steps">
+            <div class="demo-step"><span>01</span><div><strong>Open the alert</strong><p>Start with CASE-0001 and show the coordinated payment-fraud campaign in the entity graph.</p></div><b>→</b></div>
+            <div class="demo-step"><span>02</span><div><strong>Show the three lenses</strong><p>Point to timeline, evidence, counter-evidence, and competing hypotheses. No black-box score.</p></div><b>→</b></div>
+            <div class="demo-step demo-step-accent"><span>03</span><div><strong>Invite the attacker</strong><p>Run the bounded bypass variation. Let the Adversary-in-Residence pressure-test the defense.</p></div><b>→</b></div>
+            <div class="demo-step"><span>04</span><div><strong>Compare controls</strong><p>Use fraud prevented, false positives, friction, utility, and attack success to choose proportionally.</p></div><b>→</b></div>
+            <div class="demo-step"><span>05</span><div><strong>Approve safely</strong><p>Open the Decision Passport, approve to SHADOW, introduce a new variation, and capture predicted versus observed.</p></div><b>✓</b></div>
+          </div>
+          <aside class="impact-panel">
+            <div class="impact-label">WHAT THE JUDGE SHOULD REMEMBER</div>
+            <h3>We made the<br><em>attacker</em> part of<br>the design loop.</h3>
+            <div class="impact-stat-row"><div><strong>18</strong><span>visible<br>specialists</span></div><div><strong>3</strong><span>independent<br>analyst lanes</span></div><div><strong>0</strong><span>autonomous<br>production actions</span></div></div>
+            <div class="impact-badges"><span><i></i> BYPASS DETECTED</span><span><i></i> SHADOW ONLY</span><span><i></i> AUDIT READY</span></div>
+          </aside>
+        </div>
+        <div class="final-cta"><div><span class="eyebrow">THE ASK</span><strong>Judge the loop, not just the alert.</strong></div><div class="cta-actions"><a class="button button-primary" href="/" target="_blank" rel="noreferrer">Launch live demo <span>↗</span></a><button class="button button-quiet" type="button" data-prev>Replay deck <span>↺</span></button></div></div>
+      </section>
+    </main>
+
+    <footer class="deck-controls">
+      <button class="control-button" id="prevButton" type="button" aria-label="Previous slide">←</button>
+      <div class="progress-track" aria-label="Slide progress"><span id="progressBar"></span></div>
+      <div class="dot-nav" id="dotNav" aria-label="Choose slide"></div>
+      <button class="control-button" id="nextButton" type="button" aria-label="Next slide">→</button>
+      <span class="keyboard-hint">Use ← → or space to navigate</span>
+    </footer>
+  </div>
+  <script src="presentation.js" defer></script>
+</body>
+</html>
